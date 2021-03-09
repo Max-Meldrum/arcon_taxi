@@ -74,6 +74,7 @@ pub struct TaxiRideData {
     pub congestion_surcharge: f32,
 }
 
+/// A cleaned up version of TaxiRideData.
 #[arcon_decoder(,)]
 #[macros::proto]
 #[derive(Arcon, Arrow, Clone)]
@@ -84,10 +85,15 @@ pub struct TaxiRideData {
     keys = "pu_location_id"
 )]
 pub struct RideData {
+    /// Keys
     pub pu_location_id: u64,
     pub pu_time: u64,
+    pub do_time: u64,
+    /// Values
     pub fare_amount: u64,
     pub tip_amount: f32,
+    pub trip_distance: f32,
+    pub passenger_count: u64,
 }
 
 impl RideData {
@@ -95,12 +101,16 @@ impl RideData {
         Self {
             pu_location_id: t.pu_location_id,
             pu_time: datetime_to_u64(&t.tpep_pickup_datetime),
+            do_time: datetime_to_u64(&t.tpep_dropoff_datetime),
             fare_amount: t.fare_amount,
             tip_amount: t.tip_amount,
+            trip_distance: t.trip_distance,
+            passenger_count: t.passenger_count,
         }
     }
 }
 
+/// Aggregate of TaxiRideData, produced by window_sum
 #[macros::proto]
 #[derive(Arcon, Arrow, Clone, Copy)]
 #[arcon(
@@ -110,16 +120,86 @@ impl RideData {
     keys = "pu_location_id, pu_time"
 )]
 pub struct RideWindowedData {
+    /// Keys
     pub pu_location_id: u64,
     pub pu_time: u64,
-    pub fare_amount: u64,
+    /// Aggregates
+    pub count: u64,
+
+    pub sum_fare_amount: u64,
+    pub max_fare_amount: u64,
+    pub avg_fare_amount: u64,
+    pub min_fare_amount: u64,
+
+    pub sum_trip_distance: f32,
+    pub avg_trip_distance: f32,
+
+    pub sum_passenger_count: u64,
+    pub max_passenger_count: u64,
+    pub avg_passenger_count: u64,
+    pub min_passenger_count: u64,
+
+    pub sum_duration: u64,
+    pub max_duration: u64,
+    pub avg_duration: u64,
+    pub min_duration: u64,
+}
+
+// Source -> Window + KeyBy(location_id, pu_time) ->
+
+fn agg_u64(buffer: &[RideData], f: impl FnMut(&RideData) -> u64 + Copy) -> (u64, u64, u64, u64) {
+    let count = buffer.len() as u64;
+    let sum = buffer.iter().map(f).sum();
+    let max = buffer.iter().map(f).max().unwrap();
+    let min = buffer.iter().map(f).min().unwrap();
+    let avg = sum / count;
+    (sum, max, min, avg)
+}
+
+fn agg_f32(buffer: &[RideData], f: impl FnMut(&RideData) -> f32) -> (f32, f32) {
+    let count = buffer.len() as f32;
+    let sum = buffer.iter().map(f).sum();
+    let avg = sum / count;
+    (sum, avg)
 }
 
 fn window_sum(buffer: &[RideData]) -> RideWindowedData {
+    let count = buffer.len() as u64;
+
+    let (sum_fare_amount, max_fare_amount, avg_fare_amount, min_fare_amount) =
+        agg_u64(buffer, |x| x.fare_amount);
+
+    let (sum_trip_distance, avg_trip_distance) = agg_f32(buffer, |x| x.trip_distance);
+
+    let (sum_passenger_count, max_passenger_count, avg_passenger_count, min_passenger_count) =
+        agg_u64(buffer, |x| x.passenger_count);
+
+    let (sum_duration, max_duration, avg_duration, min_duration) =
+        agg_u64(buffer, |x| x.do_time.checked_sub(x.pu_time).unwrap_or(0));
+
     RideWindowedData {
         pu_location_id: buffer[0].pu_location_id,
         pu_time: buffer[0].pu_time,
-        fare_amount: buffer.iter().map(|x| x.fare_amount).sum(),
+
+        count,
+
+        sum_fare_amount,
+        max_fare_amount,
+        avg_fare_amount,
+        min_fare_amount,
+
+        sum_trip_distance,
+        avg_trip_distance,
+
+        sum_passenger_count,
+        max_passenger_count,
+        avg_passenger_count,
+        min_passenger_count,
+
+        sum_duration,
+        max_duration,
+        avg_duration,
+        min_duration,
     }
 }
 
@@ -165,7 +245,8 @@ fn main() {
         .operator(OperatorBuilder {
             constructor: Arc::new(|backend| {
                 let function = AppenderWindow::new(backend.clone(), &window_sum);
-                WindowAssigner::tumbling(function, backend, 24 * 60 * 60, 0, true)
+                let day_duration = 24 * 60 * 60;
+                WindowAssigner::tumbling(function, backend, day_duration, day_duration, true)
             }),
             conf: OperatorConf {
                 parallelism_strategy: ParallelismStrategy::Static(1),
