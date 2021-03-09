@@ -5,7 +5,12 @@ use chrono::NaiveDateTime;
 #[arcon_decoder(,)]
 #[macros::proto]
 #[derive(Arcon, Arrow, Clone)]
-#[arcon(unsafe_ser_id = 12, reliable_ser_id = 13, version = 1, keys = "vendor_id")]
+#[arcon(
+    unsafe_ser_id = 12,
+    reliable_ser_id = 13,
+    version = 1,
+    keys = "vendor_id"
+)]
 pub struct TaxiRideData {
     /// A code indicating the TPEP provider that provided the record.
     /// 1 = Creative Mobile Technologies, LLC; 2 = VeriFone Inc,
@@ -72,9 +77,15 @@ pub struct TaxiRideData {
 #[arcon_decoder(,)]
 #[macros::proto]
 #[derive(Arcon, Arrow, Clone)]
-#[arcon(unsafe_ser_id = 12, reliable_ser_id = 13, version = 1, keys = "pu_location_id")]
+#[arcon(
+    unsafe_ser_id = 12,
+    reliable_ser_id = 13,
+    version = 1,
+    keys = "pu_location_id"
+)]
 pub struct RideData {
     pub pu_location_id: u64,
+    pub pu_time: u64,
     pub fare_amount: u64,
     pub tip_amount: f32,
 }
@@ -83,24 +94,31 @@ impl RideData {
     fn from(t: TaxiRideData) -> Self {
         Self {
             pu_location_id: t.pu_location_id,
+            pu_time: datetime_to_u64(&t.tpep_pickup_datetime),
             fare_amount: t.fare_amount,
             tip_amount: t.tip_amount,
         }
     }
 }
 
-#[derive(Arcon, Arrow, prost::Message, Clone)]
-#[arcon(unsafe_ser_id = 12, reliable_ser_id = 13, version = 1)]
+#[macros::proto]
+#[derive(Arcon, Arrow, Clone, Copy)]
+#[arcon(
+    unsafe_ser_id = 12,
+    reliable_ser_id = 13,
+    version = 1,
+    keys = "pu_location_id, pu_time"
+)]
 pub struct RideWindowedData {
-    #[prost(uint64)]
     pub pu_location_id: u64,
-    #[prost(uint64)]
+    pub pu_time: u64,
     pub fare_amount: u64,
 }
 
 fn window_sum(buffer: &[RideData]) -> RideWindowedData {
-    RideWindowedData{
+    RideWindowedData {
         pu_location_id: buffer[0].pu_location_id,
+        pu_time: buffer[0].pu_time,
         fare_amount: buffer.iter().map(|x| x.fare_amount).sum(),
     }
 }
@@ -110,11 +128,35 @@ fn datetime_to_u64(datetime: &str) -> u64 {
     s.timestamp() as u64
 }
 
+#[derive(ArconState)]
+pub struct RideState<B: Backend> {
+    #[table = "rides"]
+    rides: EagerValue<RideWindowedData, B>,
+}
+
+impl<B: Backend> StateConstructor for RideState<B> {
+    type BackendType = B;
+
+    fn new(backend: Arc<Self::BackendType>) -> Self {
+        Self {
+            rides: EagerValue::new("_rides", backend),
+        }
+    }
+}
+
 fn main() {
-    let mut pipeline = Pipeline::default()
+    let conf = ArconConf {
+        epoch_interval: 2500,
+        ctrl_system_host: Some("127.0.0.1:2000".to_string()),
+        ..Default::default()
+    };
+
+    let mut pipeline = Pipeline::with_conf(conf)
         .file("yellow_tripdata_2020-01.csv", |conf| {
             conf.set_arcon_time(ArconTime::Event);
-            conf.set_timestamp_extractor(|x: &TaxiRideData| datetime_to_u64(&x.tpep_pickup_datetime));
+            conf.set_timestamp_extractor(|x: &TaxiRideData| {
+                datetime_to_u64(&x.tpep_pickup_datetime)
+            });
         })
         .operator(OperatorBuilder {
             constructor: Arc::new(|_| Map::new(|x: TaxiRideData| RideData::from(x))),
@@ -123,12 +165,24 @@ fn main() {
         .operator(OperatorBuilder {
             constructor: Arc::new(|backend| {
                 let function = AppenderWindow::new(backend.clone(), &window_sum);
-                WindowAssigner::tumbling(function, backend, 24*60*60, 0, true)
+                WindowAssigner::tumbling(function, backend, 24 * 60 * 60, 0, true)
             }),
             conf: OperatorConf {
                 parallelism_strategy: ParallelismStrategy::Static(1),
                 ..Default::default()
-            }
+            },
+        })
+        .operator(OperatorBuilder {
+            constructor: Arc::new(|backend| {
+                Map::stateful(
+                    RideState::new(backend),
+                    |ride_per_location: RideWindowedData, state| {
+                        state.rides().put(ride_per_location.clone())?;
+                        Ok(ride_per_location)
+                    },
+                )
+            }),
+            conf: Default::default(),
         })
         .to_console()
         .build();
