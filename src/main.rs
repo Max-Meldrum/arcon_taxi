@@ -1,14 +1,15 @@
 use arcon::prelude::*;
 
-pub mod data;
 pub mod agg;
+pub mod data;
+pub mod ops;
 
+use agg::window_sum;
 use data::datetime_to_u64;
-use data::TaxiRideData;
 use data::RideData;
 use data::RideState;
 use data::RideWindowedData;
-use agg::window_sum;
+use data::TaxiRideData;
 
 fn main() {
     let conf = ArconConf {

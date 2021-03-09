@@ -2,6 +2,10 @@ use arcon::arcon_decoder;
 use arcon::prelude::*;
 use chrono::NaiveDateTime;
 
+#[derive(Arcon, Arrow, Clone, prost::Message)]
+#[arcon(unsafe_ser_id = 12, reliable_ser_id = 13, version = 1)]
+pub struct Unit {}
+
 #[arcon_decoder(,)]
 #[macros::proto]
 #[derive(Arcon, Arrow, Clone)]
