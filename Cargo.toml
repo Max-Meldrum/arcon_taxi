@@ -7,6 +7,7 @@ edition = "2018"
 [dependencies]
 prost = "0.7"
 chrono = "0.4"
+macros = { path = "./macros" }
 
 [dependencies.arcon]
 git = "https://github.com/cda-group/arcon.git"
