@@ -3,3 +3,4 @@ test_data
 #IntelliJ
 /.idea
 *.iml
+yellow_tripdata_2020-01.csv
