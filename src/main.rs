@@ -1,5 +1,6 @@
 use arcon::prelude::*;
 use arcon::arcon_decoder;
+use chrono::NaiveDateTime;
 
 #[arcon_decoder(,)]
 #[derive(Arcon, Arrow, prost::Message, Clone)]
@@ -43,14 +44,19 @@ pub struct TaxiRideData {
     pub congestion_surcharge: f32,
 }
 
+fn datetime_to_u64(datetime: &str) -> u64 {
+    let s = NaiveDateTime::parse_from_str(datetime, "%Y-%m-%d %H:%M:%S").unwrap();
+    s.timestamp() as u64
+}
+
 fn main() {
     let mut pipeline = Pipeline::default()
         .file("test_data", |conf| {
             conf.set_arcon_time(ArconTime::Event);
-            conf.set_timestamp_extractor(|x: &TaxiRideData| x.vendor_id);
+            conf.set_timestamp_extractor(|x: &TaxiRideData| datetime_to_u64(&x.tpep_dropoff_datetime));
         })
         .operator(OperatorBuilder {
-            constructor: Arc::new(|_| Filter::new(|x: &TaxiRideData| x.store_and_fwd_flag == "N")),
+            constructor: Arc::new(|_| Filter::new(|x: &TaxiRideData| x.tip_amount < 10000.0)),
             conf: Default::default(),
         })
         .to_console()

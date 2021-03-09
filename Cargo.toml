@@ -1,11 +1,12 @@
 [package]
-name = "arcon_start_template"
+name = "arcon_taxi"
 version = "0.1.0"
 authors = ["Max Meldrum <max@meldrum.se>"]
 edition = "2018"
 
 [dependencies]
 prost = "0.7"
+chrono = "0.4"
 
 [dependencies.arcon]
 git = "https://github.com/cda-group/arcon.git"
