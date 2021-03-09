@@ -8,6 +8,15 @@
 cargo build --release
 ```
 
+## Running
+
+Check that you have the data file
+
+```bash
+./target/release/arcon_taxi
+```
+
+
 ## Install Shell
 
 ```bash
