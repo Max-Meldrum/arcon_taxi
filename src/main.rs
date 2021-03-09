@@ -3,25 +3,54 @@ use arcon::arcon_decoder;
 
 #[arcon_decoder(,)]
 #[derive(Arcon, Arrow, prost::Message, Clone)]
-#[arcon(unsafe_ser_id = 12, reliable_ser_id = 13, version = 1, keys = "id")]
-pub struct TestData {
+#[arcon(unsafe_ser_id = 12, reliable_ser_id = 13, version = 1, keys = "vendor_id")]
+pub struct TaxiRideData {
     #[prost(uint64)]
-    pub id: u64,
+    pub vendor_id: u64,
     #[prost(string)]
-    pub msg: String,
+    pub tpep_pickup_datetime: String,
+    #[prost(string)]
+    pub tpep_dropoff_datetime: String,
+    #[prost(uint64)]
+    pub passenger_count: u64,
     #[prost(float)]
-    pub f: f32,
+    pub trip_distance: f32,
+    #[prost(uint64)]
+    pub rate_code_id: u64,
+    #[prost(string)]
+    pub store_and_fwd_flag: String,
+    #[prost(uint64)]
+    pub pu_location_id: u64,
+    #[prost(uint64)]
+    pub du_location_id: u64,
+    #[prost(uint64)]
+    pub payment_type: u64,
+    #[prost(uint64)]
+    pub fare_amount: u64,
+    #[prost(uint64)]
+    pub extra: u64,
+    #[prost(float)]
+    pub mta_tax: f32,
+    #[prost(float)]
+    pub tip_amount: f32,
+    #[prost(uint64)]
+    pub tolls_amount: u64,
+    #[prost(float)]
+    pub improvement_surcharge: f32,
+    #[prost(float)]
+    pub total_amount: f32,
+    #[prost(float)]
+    pub congestion_surcharge: f32,
 }
 
 fn main() {
-
     let mut pipeline = Pipeline::default()
         .file("test_data", |conf| {
             conf.set_arcon_time(ArconTime::Event);
-            conf.set_timestamp_extractor(|x: &TestData| x.id);
+            conf.set_timestamp_extractor(|x: &TaxiRideData| x.vendor_id);
         })
         .operator(OperatorBuilder {
-            constructor: Arc::new(|_| Filter::new(|x: &TestData| x.f > 2.5)),
+            constructor: Arc::new(|_| Filter::new(|x: &TaxiRideData| x.store_and_fwd_flag == "N")),
             conf: Default::default(),
         })
         .to_console()
