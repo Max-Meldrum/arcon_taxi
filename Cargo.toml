@@ -10,5 +10,5 @@ chrono = "0.4"
 
 [dependencies.arcon]
 git = "https://github.com/cda-group/arcon.git"
-features = ["arcon_arrow"]
+features = ["arcon_arrow", "quiet"]
 
