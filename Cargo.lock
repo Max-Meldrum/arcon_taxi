@@ -99,7 +99,6 @@ dependencies = [
  "prost",
  "prost-types",
  "serde",
- "slog",
  "tokio",
  "twox-hash",
  "uuid",
