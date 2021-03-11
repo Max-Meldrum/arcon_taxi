@@ -54,6 +54,13 @@ fn main() {
             }),
             conf: Default::default(),
         })
+        .operator(OperatorBuilder {
+            constructor: Arc::new(|_| ops::Kibana::default()),
+            conf: OperatorConf {
+                parallelism_strategy: ParallelismStrategy::Static(1),
+                ..Default::default()
+            },
+        })
         .to_console()
         .build();
     pipeline.start();
