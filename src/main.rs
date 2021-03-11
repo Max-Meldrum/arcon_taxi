@@ -11,6 +11,8 @@ use data::RideState;
 use data::RideWindowedData;
 use data::TaxiRideData;
 
+const DAY_DURATION: u64 = 24 * 60 * 60;
+
 fn main() {
     let conf = ArconConf {
         epoch_interval: 2500,
@@ -32,8 +34,7 @@ fn main() {
         .operator(OperatorBuilder {
             constructor: Arc::new(|backend| {
                 let function = AppenderWindow::new(backend.clone(), &window_sum);
-                let day_duration = 24 * 60 * 60;
-                WindowAssigner::tumbling(function, backend, day_duration, day_duration, true)
+                WindowAssigner::tumbling(function, backend, DAY_DURATION, DAY_DURATION, true)
             }),
             conf: OperatorConf {
                 parallelism_strategy: ParallelismStrategy::Static(1),
