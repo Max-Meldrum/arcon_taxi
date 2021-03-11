@@ -153,6 +153,10 @@ pub fn datetime_to_u64(datetime: &str) -> u64 {
     s.timestamp() as u64
 }
 
+pub fn u64_to_datetime(time: u64) -> NaiveDateTime {
+    chrono::NaiveDateTime::from_timestamp(time as i64, 0)
+}
+
 #[derive(ArconState)]
 pub struct RideState<B: Backend> {
     #[table = "rides"]
