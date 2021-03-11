@@ -15,8 +15,9 @@ const DAY_DURATION: u64 = 24 * 60 * 60;
 
 fn main() {
     let conf = ArconConf {
-        epoch_interval: 2500,
+        epoch_interval: 20_000,
         ctrl_system_host: Some("127.0.0.1:2000".to_string()),
+        allocator_capacity: 2147483648,
         ..Default::default()
     };
 
