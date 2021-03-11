@@ -22,7 +22,7 @@ fn main() {
     };
 
     let mut pipeline = Pipeline::with_conf(conf)
-        .file("yellow_tripdata_2020-01.csv", |conf| {
+        .file("data/sorted_yellow_tripdata_2020.csv", |conf| {
             conf.set_arcon_time(ArconTime::Event);
             conf.set_timestamp_extractor(|x: &TaxiRideData| {
                 datetime_to_u64(&x.tpep_pickup_datetime)
