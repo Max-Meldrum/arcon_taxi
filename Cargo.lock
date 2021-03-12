@@ -80,7 +80,7 @@ checksum = "dabe5a181f83789739c194cbe5a897dde195078fac08568d09221fd6137a7ba8"
 [[package]]
 name = "arcon"
 version = "0.1.3"
-source = "git+https://github.com/cda-group/arcon.git#d4705a58a50af64e9852177dd5da6d1ede023991"
+source = "git+https://github.com/cda-group/arcon.git#28f82e259786b68dab3c0f490fb19a607abee1dd"
 dependencies = [
  "arcon_allocator",
  "arcon_error",
@@ -107,7 +107,7 @@ dependencies = [
 [[package]]
 name = "arcon_allocator"
 version = "0.1.0"
-source = "git+https://github.com/cda-group/arcon.git#d4705a58a50af64e9852177dd5da6d1ede023991"
+source = "git+https://github.com/cda-group/arcon.git#28f82e259786b68dab3c0f490fb19a607abee1dd"
 dependencies = [
  "fxhash",
 ]
@@ -115,7 +115,7 @@ dependencies = [
 [[package]]
 name = "arcon_error"
 version = "0.1.1"
-source = "git+https://github.com/cda-group/arcon.git#d4705a58a50af64e9852177dd5da6d1ede023991"
+source = "git+https://github.com/cda-group/arcon.git#28f82e259786b68dab3c0f490fb19a607abee1dd"
 dependencies = [
  "arcon_state",
 ]
@@ -123,7 +123,7 @@ dependencies = [
 [[package]]
 name = "arcon_macros"
 version = "0.1.3"
-source = "git+https://github.com/cda-group/arcon.git#d4705a58a50af64e9852177dd5da6d1ede023991"
+source = "git+https://github.com/cda-group/arcon.git#28f82e259786b68dab3c0f490fb19a607abee1dd"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -133,7 +133,7 @@ dependencies = [
 [[package]]
 name = "arcon_state"
 version = "0.1.1"
-source = "git+https://github.com/cda-group/arcon.git#d4705a58a50af64e9852177dd5da6d1ede023991"
+source = "git+https://github.com/cda-group/arcon.git#28f82e259786b68dab3c0f490fb19a607abee1dd"
 dependencies = [
  "bytes",
  "cc",
@@ -194,7 +194,7 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 [[package]]
 name = "arrow"
 version = "4.0.0-SNAPSHOT"
-source = "git+https://github.com/apache/arrow.git#7301f68d0a14e68d39d48a71a3b16358ed79cd55"
+source = "git+https://github.com/apache/arrow.git#ff331f27e07c63bfad1608831702cb35e48526c4"
 dependencies = [
  "cfg_aliases",
  "chrono",
@@ -497,9 +497,9 @@ checksum = "63396b8a4b9de3f4fdfb320ab6080762242f66a8ef174c49d8e19b674db4cdbe"
 
 [[package]]
 name = "byteorder"
-version = "1.4.2"
+version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ae44d1a3d5a19df61dd0c8beb138458ac2a53a7ac09eba97d55592540004306b"
+checksum = "14c189c53d098945499cdfa7ecc63567cf3886b3332b312a5b4585d8d3a6a610"
 
 [[package]]
 name = "bytes"
@@ -798,7 +798,7 @@ dependencies = [
 [[package]]
 name = "datafusion"
 version = "4.0.0-SNAPSHOT"
-source = "git+https://github.com/apache/arrow.git#7301f68d0a14e68d39d48a71a3b16358ed79cd55"
+source = "git+https://github.com/apache/arrow.git#ff331f27e07c63bfad1608831702cb35e48526c4"
 dependencies = [
  "ahash 0.7.2",
  "arrow",
@@ -807,6 +807,7 @@ dependencies = [
  "clap",
  "futures",
  "hashbrown",
+ "lazy_static",
  "log",
  "md-5",
  "num_cpus",
@@ -814,6 +815,7 @@ dependencies = [
  "parquet",
  "paste",
  "pin-project-lite",
+ "regex",
  "rustyline",
  "sha2",
  "sqlparser",
@@ -1993,7 +1995,7 @@ dependencies = [
 [[package]]
 name = "parquet"
 version = "4.0.0-SNAPSHOT"
-source = "git+https://github.com/apache/arrow.git#7301f68d0a14e68d39d48a71a3b16358ed79cd55"
+source = "git+https://github.com/apache/arrow.git#ff331f27e07c63bfad1608831702cb35e48526c4"
 dependencies = [
  "arrow",
  "base64 0.12.3",
@@ -2283,14 +2285,13 @@ dependencies = [
 
 [[package]]
 name = "regex"
-version = "1.4.3"
+version = "1.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9251239e129e16308e70d853559389de218ac275b515068abc96829d05b948a"
+checksum = "54fd1046a3107eb58f42de31d656fee6853e5d276c455fd943742dce89fc3dd3"
 dependencies = [
  "aho-corasick",
  "memchr",
  "regex-syntax",
- "thread_local",
 ]
 
 [[package]]
@@ -2304,9 +2305,9 @@ dependencies = [
 
 [[package]]
 name = "regex-syntax"
-version = "0.6.22"
+version = "0.6.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b5eb417147ba9860a96cfe72a0b93bf88fee1744b5636ec99ab20c1aa9376581"
+checksum = "24d5f089152e60f62d28b835fbff2cd2e8dc0baf1ac13343bef92ab7eed84548"
 
 [[package]]
 name = "remove_dir_all"
@@ -2319,9 +2320,9 @@ dependencies = [
 
 [[package]]
 name = "reqwest"
-version = "0.11.1"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0460542b551950620a3648c6aa23318ac6b3cd779114bd873209e6e8b5eb1c34"
+checksum = "bf12057f289428dbf5c591c74bf10392e4a8003f993405a902f20117019022d4"
 dependencies = [
  "async-compression",
  "base64 0.13.0",
@@ -2703,9 +2704,9 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "syn"
-version = "1.0.62"
+version = "1.0.63"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "123a78a3596b24fee53a6464ce52d8ecbf62241e6294c7e7fe12086cd161f512"
+checksum = "8fd9bc7ccc2688b3344c2f48b9b546648b25ce0b20fc717ee7fa7981a8ca9717"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2862,9 +2863,9 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 
 [[package]]
 name = "tokio"
-version = "1.2.0"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e8190d04c665ea9e6b6a0dc45523ade572c088d2e6566244c1122671dbf4ae3a"
+checksum = "8d56477f6ed99e10225f38f9f75f872f29b8b8bd8c0b946f63345bb144e9eeda"
 dependencies = [
  "autocfg",
  "bytes",
@@ -2903,9 +2904,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-stream"
-version = "0.1.3"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1981ad97df782ab506a1f43bf82c967326960d278acf3bf8279809648c3ff3ea"
+checksum = "c535f53c0cfa1acace62995a8994fc9cc1f12d202420da96ff306ee24d576469"
 dependencies = [
  "futures-core",
  "pin-project-lite",
@@ -2914,9 +2915,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-util"
-version = "0.6.3"
+version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ebb7cb2f00c5ae8df755b252306272cd1790d39728363936e01827e11f0b017b"
+checksum = "ec31e5cc6b46e653cf57762f36f71d5e6386391d88a72fd6db4508f8f676fb29"
 dependencies = [
  "bytes",
  "futures-core",
