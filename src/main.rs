@@ -21,7 +21,7 @@ fn taxi_source_builder() -> SourceBuilder<TaxiSource<TaxiRideData>> {
 
     SourceBuilder {
         constructor: Arc::new(move |_| {
-            TaxiSource::new("data/sorted_yellow_tripdata_2020", source_conf.clone())
+            TaxiSource::new("data/sorted_yellow_tripdata_2020.csv", source_conf.clone())
         }),
         conf: conf_copy,
     }
@@ -30,6 +30,7 @@ fn taxi_source_builder() -> SourceBuilder<TaxiSource<TaxiRideData>> {
 fn main() {
     let conf = ArconConf {
         epoch_interval: 20_000,
+        watermark_interval: 1000,
         ctrl_system_host: Some("127.0.0.1:2000".to_string()),
         allocator_capacity: 2147483648,
         ..Default::default()

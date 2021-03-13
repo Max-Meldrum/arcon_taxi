@@ -6,7 +6,7 @@ use std::{
     str::FromStr,
 };
 
-const RESCHEDULE_EVERY: usize = 10000;
+const RESCHEDULE_EVERY: usize = 4000;
 
 pub struct TaxiSource<A>
 where
