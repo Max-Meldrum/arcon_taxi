@@ -19,6 +19,7 @@ curl \
                 "format": "yyyy-MM-dd HH:mm:ss"
             },
             "pu_location_id":      {"type": "integer"},
+            "pu_location_name":    {"type": "keyword"},
             "count":               {"type": "integer"},
             "sum_fare_amount":     {"type": "integer"},
             "max_fare_amount":     {"type": "integer"},
