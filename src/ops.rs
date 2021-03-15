@@ -63,6 +63,7 @@ async fn send(client: &mut elasticsearch::Elasticsearch, data: data::RideWindowe
             "time": time,
             // Keys
             "pu_location_id": data.pu_location_id,
+            "pu_location_name": data.pu_location_name,
             // Aggregates
             "count": data.count,
 

@@ -115,7 +115,7 @@ impl From<TaxiRideData> for RideData {
 
 /// Aggregate of TaxiRideData, produced by window_sum
 #[macros::proto]
-#[derive(Arcon, Arrow, Clone, Copy)]
+#[derive(Arcon, Arrow, Clone)]
 #[arcon(
     unsafe_ser_id = 12,
     reliable_ser_id = 13,
@@ -126,6 +126,8 @@ pub struct RideWindowedData {
     /// Keys
     pub pu_location_id: u64,
     pub pu_time: u64,
+    /// Other
+    pub pu_location_name: String,
     /// Aggregates
     pub count: u64,
 
