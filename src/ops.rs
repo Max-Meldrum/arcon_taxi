@@ -31,7 +31,7 @@ impl Operator for Kibana {
         &mut self,
         element: ArconElement<Self::IN>,
         _ctx: OperatorContext<Self, impl Backend, impl ComponentDefinition>,
-    ) -> OperatorResult<()> {
+    ) -> ArconResult<()> {
         self.runtime.block_on(send(
             &mut self.client,
             element.data,

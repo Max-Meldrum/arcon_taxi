@@ -3,7 +3,6 @@ use arcon::prelude::*;
 pub mod agg;
 pub mod data;
 pub mod ops;
-pub mod source;
 
 use agg::window_sum;
 use data::datetime_to_u64;
@@ -11,21 +10,6 @@ use data::RideData;
 use data::RideState;
 use data::RideWindowedData;
 use data::TaxiRideData;
-use source::TaxiSource;
-
-fn taxi_source_builder() -> SourceBuilder<TaxiSource<TaxiRideData>> {
-    let mut source_conf: SourceConf<TaxiRideData> = SourceConf::default();
-    source_conf
-        .set_timestamp_extractor(|x: &TaxiRideData| datetime_to_u64(&x.tpep_pickup_datetime));
-    let conf_copy = source_conf.clone();
-
-    SourceBuilder {
-        constructor: Arc::new(move |_| {
-            TaxiSource::new("data/sorted_yellow_tripdata_2020.csv", source_conf.clone())
-        }),
-        conf: conf_copy,
-    }
-}
 
 fn main() {
     let conf = ArconConf {
@@ -37,7 +21,13 @@ fn main() {
     };
 
     let mut pipeline = Pipeline::with_conf(conf)
-        .source(taxi_source_builder())
+        .file("data/sorted_yellow_tripdata_2020.csv", |cfg| {
+            cfg.set_timestamp_extractor(|x: &TaxiRideData| {
+                datetime_to_u64(&x.tpep_pickup_datetime)
+            });
+            cfg.set_arcon_time(ArconTime::Event);
+            cfg.set_batch_size(4000);
+        })
         .operator(OperatorBuilder {
             constructor: Arc::new(|_| Map::new(|x: TaxiRideData| RideData::from(x))),
             conf: Default::default(),

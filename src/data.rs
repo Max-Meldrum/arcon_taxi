@@ -1,6 +1,7 @@
 use arcon::arcon_decoder;
 use arcon::prelude::*;
 use chrono::NaiveDateTime;
+use std::fmt;
 
 #[derive(Arcon, Arrow, Clone, prost::Message)]
 #[arcon(unsafe_ser_id = 12, reliable_ser_id = 13, version = 1)]
@@ -77,6 +78,13 @@ pub struct TaxiRideData {
     /// This field is not documented.
     pub congestion_surcharge: f32,
 }
+
+impl fmt::Display for TaxiRideData {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "")
+    }
+}
+
 /// A cleaned up version of TaxiRideData.
 #[arcon_decoder(,)]
 #[macros::proto]

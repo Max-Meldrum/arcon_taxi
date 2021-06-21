@@ -15,5 +15,4 @@ serde_json = "~1"
 
 [dependencies.arcon]
 git = "https://github.com/cda-group/arcon.git"
-features = ["arcon_arrow"]
 
